@@ -54,8 +54,11 @@
             }
           }.bind(this), 100);
         },
-        _optionSelectedChanged: function (newOption) {
+        _optionSelectedChanged: function (newOption, oldOption) {
           this.notifyPath('route.path', '/' + newOption);
+          this.async(function () {
+            this.set('optionSelected', newOption);
+          }.bind(this))
         }
       });
     })();
