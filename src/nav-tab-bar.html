@@ -1,6 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
 <link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
 
 <dom-module id="nav-tab-bar">
   <template>
@@ -9,11 +10,11 @@
         display: block;
       }
     </style>
-
+    <app-route route="{{route}}" pattern="/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
     <paper-tabs selected="{{optionSelected}}" attr-for-selected="name">
       <template is="dom-repeat" items={{options}} as=item index-as=index>
         <!-- {{item}} and {{index}} can be used in this binding scope -->
-        <paper-tab name="[[item]]">[[item]]</paper-tab>
+        <paper-tab name="[[item]]" on-tap="_changeOption">[[item]]</paper-tab>
       </template>
     </paper-tabs>
 
@@ -36,13 +37,16 @@
           },
           optionSelected: {
             type: String,
-            notify: true,
-            observer: '_optionSelectedChanged'
+            notify: true
           }
         },
         _routeChanged: function (route) {
+          console.log('_routeChanged')
           if (route.path == '') {
-            this._optionSelectedChanged(this.options[0]);
+            this.async(function () {
+              this.set('optionSelected', this.options[0]);
+              this.notifyPath('route.path', '/' + this.options[0]);
+            }.bind(this))
           }
         },
         _optionsChanged: function (newOptions) {
@@ -50,15 +54,13 @@
             if (!this.route.path) {
               this.set('optionSelected', newOptions[0]);
             } else {
-              this.set('optionSelected', this.route.path.replace('/', ''));
+              this.set('optionSelected', this.routeData.page);
             }
           }.bind(this), 100);
         },
-        _optionSelectedChanged: function (newOption, oldOption) {
-          this.notifyPath('route.path', '/' + newOption);
-          this.async(function () {
-            this.set('optionSelected', newOption);
-          }.bind(this))
+        _changeOption: function (e) {
+          console.log(e.target.name)
+          this.notifyPath('route.path', '/' + e.target.name);
         }
       });
     })();
