@@ -41,7 +41,6 @@
           }
         },
         _routeChanged: function (route) {
-          console.log('_routeChanged')
           if (route.path == '') {
             this.async(function () {
               this.set('optionSelected', this.options[0]);
@@ -59,7 +58,6 @@
           }.bind(this), 100);
         },
         _changeOption: function (e) {
-          console.log(e.target.name)
           this.notifyPath('route.path', '/' + e.target.name);
         }
       });
