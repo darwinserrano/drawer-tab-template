@@ -1,0 +1,63 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tabs.html">
+<link rel="import" href="../bower_components/paper-tabs/paper-tab.html">
+
+<dom-module id="nav-tab-bar">
+  <template>
+    <style>
+       :host {
+        display: block;
+      }
+    </style>
+
+    <paper-tabs selected="{{optionSelected}}" attr-for-selected="name">
+      <template is="dom-repeat" items={{options}} as=item index-as=index>
+        <!-- {{item}} and {{index}} can be used in this binding scope -->
+        <paper-tab name="[[item]]">[[item]]</paper-tab>
+      </template>
+    </paper-tabs>
+
+  </template>
+  <script>
+    (function () {
+      'use strict';
+
+      Polymer({
+        is: 'nav-tab-bar',
+        properties: {
+          options: {
+            type: Array,
+            observer: '_optionsChanged'
+          },
+          route: {
+            type: Object,
+            notify: true,
+            observer: '_routeChanged'
+          },
+          optionSelected: {
+            type: String,
+            notify: true,
+            observer: '_optionSelectedChanged'
+          }
+        },
+        _routeChanged: function (route) {
+          if (route.path == '') {
+            this._optionSelectedChanged(this.options[0]);
+          }
+        },
+        _optionsChanged: function (newOptions) {
+          this.debounce('selected-tab', function () {
+            if (!this.route.path) {
+              this.set('optionSelected', newOptions[0]);
+            } else {
+              this.set('optionSelected', this.route.path.replace('/', ''));
+            }
+          }.bind(this), 100);
+        },
+        _optionSelectedChanged: function (newOption) {
+          this.notifyPath('route.path', '/' + newOption);
+        }
+      });
+    })();
+  </script>
+</dom-module>
